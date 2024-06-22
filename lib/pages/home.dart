@@ -23,6 +23,15 @@ class _HomePageState extends State<HomePage> {
     diets = DietModel.getDiets();
   }
 
+  void onDietSelected(int index) {
+    setState(() {
+      for (var element in diets) {
+        element.isViewSelected = false;
+      }
+      diets[index].isViewSelected = true;
+    });
+  }
+
   @override
   void initState() {
     super.initState();
@@ -42,36 +51,101 @@ class _HomePageState extends State<HomePage> {
           const SizedBox(height: 40),
           categoriesSection(),
           const SizedBox(height: 40),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const Padding(
-                padding: EdgeInsets.only(left: 20),
-                child: Text(
-                  'Recommended for you',
-                  style: TextStyle(
+          dietsSection(),
+        ],
+      ),
+    );
+  }
+
+  Column dietsSection() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        const Padding(
+          padding: EdgeInsets.only(left: 20),
+          child: Text(
+            'Recommended for you',
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 18,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        const SizedBox(height: 15),
+        SizedBox(
+          height: 240,
+          child: ListView.separated(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            itemCount: diets.length,
+            separatorBuilder: (context, index) => const SizedBox(width: 20),
+            itemBuilder: (context, index) {
+              return dietsTile(index);
+            },
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget dietsTile(int index) {
+    return GestureDetector(
+      onTap: () => onDietSelected(index),
+      child: Container(
+        width: 210,
+        decoration: BoxDecoration(
+          color: categories[index].boxColor.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            SvgPicture.asset(diets[index].iconPath),
+            Column(
+              children: [
+                Text(
+                  diets[index].name,
+                  style: const TextStyle(
                     color: Colors.black,
-                    fontSize: 18,
+                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
-              ),
-              const SizedBox(height: 15),
-              SizedBox(
-                height: 240,
-                child: ListView.separated(
-                  scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: 20),
-                  itemCount: categories.length,
-                  separatorBuilder: (context, index) => const SizedBox(width: 20),
-                  itemBuilder: (context, index) {
-                    return categoriesTile(index);
-                  },
+                Text(
+                  '${diets[index].level} | ${diets[index].duration} | ${diets[index].calories}',
+                  style: TextStyle(
+                    color: Colors.black.withOpacity(0.5),
+                    fontSize: 14,
+                    fontWeight: FontWeight.w400,
+                  ),
                 ),
-              ),
-            ],
-          ),
-        ],
+              ],
+            ),
+            Container(
+                height: 45,
+                width: 130,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      diets[index].isViewSelected ? const Color(0xff9dceff).withOpacity(0.4) : const Color(0xff9dceff),
+                      diets[index].isViewSelected ? const Color(0xff92a3fd).withOpacity(0.4) : const Color(0xff92a3fd),
+                    ],
+                  ),
+                  borderRadius: BorderRadius.circular(50),
+                ),
+                child: Center(
+                  child: Text(
+                    'View',
+                    style: TextStyle(
+                      color: diets[index].isViewSelected ? Colors.black : Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ))
+          ],
+        ),
       ),
     );
   }
